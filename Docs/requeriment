@@ -1,0 +1,114 @@
+# Documento de Requisitos - Cardápio Interativo de Natal Affetto
+
+## Introdução
+
+O Cardápio Interativo de Natal da Affetto é uma aplicação web PWA (Progressive Web App) que permite aos clientes navegar pelo cardápio especial de Natal, adicionar itens a um carrinho de compras dinâmico e enviar pedidos completos diretamente via WhatsApp. A aplicação oferece uma experiência elegante, responsiva e funcional, com suporte offline e painel administrativo para gestão de produtos e pedidos.
+
+A solução utiliza Vue 3 + TypeScript + Vite no frontend, com Pinia para gerenciamento de estado, Vue Router para navegação e suporte PWA via vite-plugin-pwa; Supabase como backend (PostgreSQL + Auth + Storage), integração com WhatsApp via API wa.me, e será implantada em Vercel ou Netlify.
+
+## Requisitos
+
+### Requisito 1: Navegação pelo Cardápio
+
+**User Story:** Como cliente, quero navegar pelas diferentes categorias do cardápio (entradas, massas, saladas, pratos principais, acompanhamentos, sobremesas, bebidas), para que eu possa explorar todas as opções disponíveis para minha ceia de Natal.
+
+#### Acceptance Criteria
+
+1. QUANDO o cliente acessa a aplicação ENTÃO o sistema SHALL exibir a página inicial com banner hero e grid de categorias do cardápio
+2. QUANDO o cliente clica em uma categoria ENTÃO o sistema SHALL navegar para a página de produtos daquela categoria
+3. QUANDO o cliente visualiza uma categoria ENTÃO o sistema SHALL exibir todos os produtos disponíveis em formato de cards com imagem, nome, descrição e preço
+4. IF o produto possui opções de tamanho (5p/10p) THEN o sistema SHALL exibir as opções de forma clara no card
+5. QUANDO o cliente está em uma página de categoria ENTÃO o sistema SHALL exibir breadcrumbs para facilitar a navegação
+
+### Requisito 2: Carrinho de Compras Dinâmico
+
+**User Story:** Como cliente, quero adicionar itens individualmente ao carrinho e gerenciar quantidades, para que eu possa montar meu pedido personalizado antes de finalizar.
+
+#### Acceptance Criteria
+
+1. QUANDO o cliente clica em "Adicionar ao Carrinho" ENTÃO o sistema SHALL adicionar o item ao carrinho com quantidade inicial de 1
+2. WHEN um item é adicionado ao carrinho THEN o sistema SHALL atualizar o contador de itens no ícone do carrinho no header
+3. WHEN o cliente visualiza o carrinho THEN o sistema SHALL exibir todos os itens com imagem, nome, preço unitário, quantidade e subtotal
+4. WHEN o cliente ajusta a quantidade de um item THEN o sistema SHALL recalcular automaticamente o subtotal do item e o total do pedido
+5. WHEN o cliente remove um item do carrinho THEN o sistema SHALL atualizar o carrinho e recalcular o total
+6. WHEN o carrinho está vazio THEN o sistema SHALL exibir mensagem informativa e botão para voltar ao cardápio
+7. IF o produto possui opções de tamanho THEN o sistema SHALL permitir selecionar a opção antes de adicionar ao carrinho
+
+### Requisito 3: Envio de Pedido via WhatsApp
+
+**User Story:** Como cliente, quero enviar meu pedido completo via WhatsApp com um resumo automático, para que eu possa finalizar minha compra de forma rápida e conveniente.
+
+#### Acceptance Criteria
+
+1. WHEN o cliente clica em "Finalizar Pedido" no carrinho THEN o sistema SHALL navegar para a página de checkout
+2. WHEN o cliente está no checkout THEN o sistema SHALL solicitar nome completo, número de WhatsApp, endereço de entrega, data preferida e horário
+3. WHEN o cliente preenche os dados e clica em "Confirmar e Enviar via WhatsApp" THEN o sistema SHALL validar todos os campos obrigatórios
+4. IF todos os campos estão válidos THEN o sistema SHALL gerar uma mensagem formatada com: nome do cliente, lista de itens com quantidades, total do pedido, endereço, data e horário
+5. WHEN a mensagem é gerada THEN o sistema SHALL abrir o WhatsApp (web ou app) com a mensagem pré-preenchida para o número configurado da Affetto
+6. WHEN o pedido é enviado THEN o sistema SHALL registrar o pedido no banco de dados Supabase
+7. WHEN o pedido é registrado THEN o sistema SHALL exibir mensagem de confirmação e limpar o carrinho
+
+### Requisito 4: Persistência de Dados com Supabase
+
+**User Story:** Como administrador, quero que todos os produtos e pedidos sejam armazenados no Supabase, para que eu possa gerenciar o catálogo e acompanhar os pedidos recebidos.
+
+#### Acceptance Criteria
+
+1. WHEN a aplicação é carregada THEN o sistema SHALL buscar todos os produtos ativos do banco de dados Supabase
+2. WHEN um pedido é finalizado THEN o sistema SHALL salvar no Supabase: dados do cliente, itens do pedido, quantidades, total, data/hora e status
+3. WHEN há erro de conexão com Supabase THEN o sistema SHALL exibir mensagem de erro amigável e permitir retry
+4. WHEN o administrador adiciona/edita um produto THEN o sistema SHALL persistir as alterações no Supabase imediatamente
+5. IF o produto possui imagem THEN o sistema SHALL armazenar a imagem no Supabase Storage e salvar a URL no registro do produto
+
+### Requisito 5: Painel Administrativo
+
+**User Story:** Como administrador, quero acessar um painel para gerenciar produtos e visualizar pedidos, para que eu possa manter o cardápio atualizado e acompanhar as vendas.
+
+#### Acceptance Criteria
+
+1. WHEN o administrador acessa /admin THEN o sistema SHALL solicitar autenticação via Supabase Auth
+2. WHEN o administrador está autenticado THEN o sistema SHALL exibir dashboard com resumo de pedidos e acesso às funcionalidades
+3. WHEN o administrador acessa a gestão de produtos THEN o sistema SHALL listar todos os produtos com opções de editar, desativar e adicionar novo
+4. WHEN o administrador cria/edita um produto THEN o sistema SHALL permitir definir: nome, descrição, preço, categoria, imagem, opções de tamanho e status (ativo/inativo)
+5. WHEN o administrador acessa a lista de pedidos THEN o sistema SHALL exibir todos os pedidos com filtros por data, status e busca por cliente
+6. WHEN o administrador visualiza um pedido THEN o sistema SHALL exibir todos os detalhes: cliente, itens, total, data/hora e status
+7. WHEN o administrador atualiza o status de um pedido THEN o sistema SHALL persistir a alteração no Supabase
+
+### Requisito 6: Progressive Web App (PWA)
+
+**User Story:** Como cliente, quero instalar a aplicação no meu celular e acessá-la offline, para que eu possa navegar pelo cardápio mesmo sem conexão com internet.
+
+#### Acceptance Criteria
+
+1. WHEN o cliente acessa a aplicação em um dispositivo móvel THEN o navegador SHALL exibir prompt para instalar o PWA
+2. WHEN o cliente instala o PWA THEN o sistema SHALL adicionar ícone na tela inicial do dispositivo
+3. WHEN o cliente abre o PWA instalado THEN o sistema SHALL abrir em modo standalone (sem barra de navegação do navegador)
+4. WHEN o cliente acessa a aplicação offline THEN o sistema SHALL exibir produtos em cache e indicar que está offline
+5. WHEN o cliente tenta finalizar pedido offline THEN o sistema SHALL informar que é necessário conexão e salvar o carrinho localmente
+6. WHEN a conexão é restaurada THEN o sistema SHALL sincronizar dados pendentes automaticamente
+7. WHEN há atualização da aplicação THEN o sistema SHALL notificar o usuário e oferecer opção de atualizar
+
+### Requisito 7: Interface Responsiva e Elegante
+
+**User Story:** Como cliente, quero uma interface bonita e fácil de usar em qualquer dispositivo, para que eu tenha uma experiência agradável ao fazer meu pedido.
+
+#### Acceptance Criteria
+
+1. WHEN o cliente acessa a aplicação em qualquer dispositivo THEN o sistema SHALL adaptar o layout automaticamente (mobile, tablet, desktop)
+2. WHEN o cliente navega pela aplicação THEN o sistema SHALL manter consistência visual com a identidade da marca Affetto
+3. WHEN o cliente interage com elementos THEN o sistema SHALL fornecer feedback visual (hover, loading, transições suaves)
+4. WHEN o cliente visualiza imagens de produtos THEN o sistema SHALL carregar imagens otimizadas para o tamanho da tela
+5. IF o dispositivo suporta dark mode THEN o sistema SHALL respeitar a preferência do usuário
+6. WHEN o cliente usa a aplicação THEN o sistema SHALL garantir acessibilidade (contraste, tamanhos de fonte, navegação por teclado)
+
+### Requisito 8: Configuração e Personalização
+
+**User Story:** Como administrador, quero configurar informações da loja (número WhatsApp, horários, mensagens), para que a aplicação reflita as informações corretas do negócio.
+
+#### Acceptance Criteria
+
+1. WHEN o administrador acessa configurações THEN o sistema SHALL permitir editar: número de WhatsApp, horários de funcionamento, mensagem de boas-vindas e informações de contato
+2. WHEN o administrador salva configurações THEN o sistema SHALL persistir no Supabase e aplicar imediatamente
+3. WHEN o cliente visualiza informações de contato THEN o sistema SHALL exibir os dados configurados pelo administrador
+4. WHEN a mensagem do WhatsApp é gerada THEN o sistema SHALL usar o template configurado pelo administrador
+5. IF não há configurações definidas THEN o sistema SHALL usar valores padrão
