@@ -11,6 +11,12 @@ type OrderRow = {
   created_at?: string
 }
 
+type BestSeller = {
+  product_id?: string | null
+  name: string
+  quantity: number
+}
+
 const router = useRouter()
 
 const totalOrders = ref(0)
@@ -19,6 +25,7 @@ const pendingCount = ref(0)
 const completedCount = ref(0)
 const recentOrders = ref<OrderRow[]>([])
 const loading = ref(true)
+const bestSellers = ref<BestSeller[]>([])
 
 const loadSummary = async () => {
   if (!supabase) {
@@ -42,7 +49,39 @@ const loadSummary = async () => {
   loading.value = false
 }
 
-onMounted(loadSummary)
+const loadBestSellers = async () => {
+  if (!supabase) return
+  const { data, error } = await supabase
+    .from('order_items')
+    .select('product_id,product_name,quantity')
+
+  if (error || !data) return
+
+  const aggregated = new Map<string, BestSeller>()
+
+  for (const row of data as any[]) {
+    const key = row.product_id || row.product_name || 'desconhecido'
+    const existing = aggregated.get(key)
+    const qty = Number(row.quantity) || 0
+    if (existing) {
+      existing.quantity += qty
+    } else {
+      aggregated.set(key, {
+        product_id: row.product_id || null,
+        name: row.product_name || 'Sem nome',
+        quantity: qty,
+      })
+    }
+  }
+
+  const sorted = Array.from(aggregated.values()).sort((a, b) => b.quantity - a.quantity)
+  bestSellers.value = sorted.slice(0, 4)
+}
+
+onMounted(() => {
+  loadSummary()
+  loadBestSellers()
+})
 
 const goProducts = () => router.push('/admin/categorias')
 
@@ -201,48 +240,15 @@ const goSettings = () => router.push('/admin/config')
           <aside class="content-side">
             <section class="panel">
               <p class="panel-title">Itens Mais Vendidos</p>
-              <ul class="best-list">
-                <li class="best-item">
-                  <div
-                    class="best-thumb"
-                    style="background-image: url('https://images.unsplash.com/photo-1608198093002-ad4e005484ec?auto=format&fit=crop&w=200&q=80');"
-                  ></div>
+              <ul v-if="bestSellers.length" class="best-list">
+                <li v-for="item in bestSellers" :key="item.product_id || item.name" class="best-item">
                   <div class="best-text">
-                    <p class="best-name">Peru Assado com Ervas</p>
-                    <p class="best-meta">35 vendidos (mock)</p>
-                  </div>
-                </li>
-                <li class="best-item">
-                  <div
-                    class="best-thumb"
-                    style="background-image: url('https://images.unsplash.com/photo-1485921325833-74b9ce41c814?auto=format&fit=crop&w=200&q=80');"
-                  ></div>
-                  <div class="best-text">
-                    <p class="best-name">Bacalhoada à Gomes de Sá</p>
-                    <p class="best-meta">28 vendidos (mock)</p>
-                  </div>
-                </li>
-                <li class="best-item">
-                  <div
-                    class="best-thumb"
-                    style="background-image: url('https://images.unsplash.com/photo-1604908176997-1251884b08a9?auto=format&fit=crop&w=200&q=80');"
-                  ></div>
-                  <div class="best-text">
-                    <p class="best-name">Salada de Maionese Festiva</p>
-                    <p class="best-meta">22 vendidos (mock)</p>
-                  </div>
-                </li>
-                <li class="best-item">
-                  <div
-                    class="best-thumb"
-                    style="background-image: url('https://images.unsplash.com/photo-1542089363-5427f1bf41c5?auto=format&fit=crop&w=200&q=80');"
-                  ></div>
-                  <div class="best-text">
-                    <p class="best-name">Rabanada Tradicional</p>
-                    <p class="best-meta">19 vendidos (mock)</p>
+                    <p class="best-name">{{ item.name }}</p>
+                    <p class="best-meta">{{ item.quantity }} vendidos</p>
                   </div>
                 </li>
               </ul>
+              <p v-else class="table-empty">Nenhum item vendido ainda.</p>
             </section>
           </aside>
         </section>
