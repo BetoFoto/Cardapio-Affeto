@@ -42,6 +42,8 @@ export type Order = {
   whatsapp_sent_at?: string
   created_at?: string
   updated_at?: string
+  admin_tag_label?: string
+  admin_tag_color?: string
 }
 
 export type SettingsKV = { 

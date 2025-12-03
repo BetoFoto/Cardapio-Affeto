@@ -15,6 +15,14 @@ type SettingsForm = {
   topbar_message?: string
   how_to_order_text?: string
   terms_text?: string
+  order_tag_red_label?: string
+  order_tag_orange_label?: string
+  order_tag_yellow_label?: string
+  order_tag_green_label?: string
+  order_tag_teal_label?: string
+  order_tag_blue_label?: string
+  order_tag_purple_label?: string
+  order_tag_gray_label?: string
 }
 
 const settings = ref<SettingsForm>({ whatsapp_number: '' })
@@ -35,6 +43,14 @@ const KEYS: (keyof SettingsForm)[] = [
   'topbar_message',
   'how_to_order_text',
   'terms_text',
+  'order_tag_red_label',
+  'order_tag_orange_label',
+  'order_tag_yellow_label',
+  'order_tag_green_label',
+  'order_tag_teal_label',
+  'order_tag_blue_label',
+  'order_tag_purple_label',
+  'order_tag_gray_label',
 ]
 
 const load = async () => {
@@ -55,6 +71,14 @@ const load = async () => {
       topbar_message: map.topbar_message || '',
       how_to_order_text: map.how_to_order_text || '',
       terms_text: map.terms_text || '',
+      order_tag_red_label: map.order_tag_red_label || 'Cliente não pagou a entrada',
+      order_tag_orange_label: map.order_tag_orange_label || '',
+      order_tag_yellow_label: map.order_tag_yellow_label || '',
+      order_tag_green_label: map.order_tag_green_label || '',
+      order_tag_teal_label: map.order_tag_teal_label || '',
+      order_tag_blue_label: map.order_tag_blue_label || '',
+      order_tag_purple_label: map.order_tag_purple_label || '',
+      order_tag_gray_label: map.order_tag_gray_label || '',
     }
   }
 }
@@ -305,6 +329,117 @@ const save = async () => {
           </div>
         </div>
       </section>
+
+      <section class="settings-card">
+        <h2 class="card-title">Tags de pedidos</h2>
+        <p class="card-description">Defina o texto associado a cada cor de etiqueta usada na gestão de pedidos.</p>
+
+        <div class="form-grid">
+          <div class="form-field full">
+            <label class="field-label" for="order_tag_red_label">Tag vermelha</label>
+            <div class="tag-config-row">
+              <span class="tag-config-pill tag-config-pill--red">Vermelho</span>
+              <input
+                id="order_tag_red_label"
+                v-model="settings.order_tag_red_label"
+                class="field-input"
+                placeholder="Ex.: Cliente não pagou a entrada"
+              />
+            </div>
+          </div>
+
+          <div class="form-field full">
+            <label class="field-label" for="order_tag_orange_label">Tag laranja</label>
+            <div class="tag-config-row">
+              <span class="tag-config-pill tag-config-pill--orange">Laranja</span>
+              <input
+                id="order_tag_orange_label"
+                v-model="settings.order_tag_orange_label"
+                class="field-input"
+                placeholder="Ex.: Aguardando contato"
+              />
+            </div>
+          </div>
+
+          <div class="form-field full">
+            <label class="field-label" for="order_tag_yellow_label">Tag amarela</label>
+            <div class="tag-config-row">
+              <span class="tag-config-pill tag-config-pill--yellow">Amarelo</span>
+              <input
+                id="order_tag_yellow_label"
+                v-model="settings.order_tag_yellow_label"
+                class="field-input"
+                placeholder="Ex.: Pagamento parcial / pendente"
+              />
+            </div>
+          </div>
+
+          <div class="form-field full">
+            <label class="field-label" for="order_tag_green_label">Tag verde</label>
+            <div class="tag-config-row">
+              <span class="tag-config-pill tag-config-pill--green">Verde</span>
+              <input
+                id="order_tag_green_label"
+                v-model="settings.order_tag_green_label"
+                class="field-input"
+                placeholder="Ex.: Cliente realizou o pagamento"
+              />
+            </div>
+          </div>
+
+          <div class="form-field full">
+            <label class="field-label" for="order_tag_teal_label">Tag verde água</label>
+            <div class="tag-config-row">
+              <span class="tag-config-pill tag-config-pill--teal">Verde água</span>
+              <input
+                id="order_tag_teal_label"
+                v-model="settings.order_tag_teal_label"
+                class="field-input"
+                placeholder="Ex.: Aguardando confirmação de detalhes"
+              />
+            </div>
+          </div>
+
+          <div class="form-field full">
+            <label class="field-label" for="order_tag_blue_label">Tag azul</label>
+            <div class="tag-config-row">
+              <span class="tag-config-pill tag-config-pill--blue">Azul</span>
+              <input
+                id="order_tag_blue_label"
+                v-model="settings.order_tag_blue_label"
+                class="field-input"
+                placeholder="Ex.: Informação adicional importante"
+              />
+            </div>
+          </div>
+
+          <div class="form-field full">
+            <label class="field-label" for="order_tag_purple_label">Tag roxa</label>
+            <div class="tag-config-row">
+              <span class="tag-config-pill tag-config-pill--purple">Roxo</span>
+              <input
+                id="order_tag_purple_label"
+                v-model="settings.order_tag_purple_label"
+                class="field-input"
+                placeholder="Ex.: Cliente recorrente / VIP"
+              />
+            </div>
+          </div>
+
+          <div class="form-field full">
+            <label class="field-label" for="order_tag_gray_label">Tag cinza</label>
+            <div class="tag-config-row">
+              <span class="tag-config-pill tag-config-pill--gray">Cinza</span>
+              <input
+                id="order_tag_gray_label"
+                v-model="settings.order_tag_gray_label"
+                class="field-input"
+                placeholder="Ex.: Observações gerais"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <div class="settings-footer">
@@ -514,6 +649,63 @@ const save = async () => {
   background: #b31919;
   color: #ffffff;
   border-color: #b31919;
+}
+
+.tag-config-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag-config-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.tag-config-pill--red {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.tag-config-pill--orange {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.tag-config-pill--yellow {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.tag-config-pill--green {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.tag-config-pill--teal {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.tag-config-pill--blue {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.tag-config-pill--purple {
+  background: #f3e8ff;
+  color: #6b21a8;
+}
+
+.tag-config-pill--gray {
+  background: #e5e7eb;
+  color: #111827;
 }
 
 @media (max-width: 900px) {
