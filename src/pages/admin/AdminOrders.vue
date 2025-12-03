@@ -7,6 +7,7 @@ const orders = ref<Order[]>([])
 const query = ref('')
 const status = ref<string>('')
 const date = ref<string>('')
+const tagFilter = ref<string>('')
 
 const selectedOrder = ref<Order | null>(null)
 const orderItems = ref<any[]>([])
@@ -14,6 +15,9 @@ const loadingDetails = ref(false)
 
 const selectedIds = ref<string[]>([])
 const bulkStatus = ref<Order['status'] | ''>('')
+const editingTagForId = ref<string | null>(null)
+const tagColor = ref<'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'blue' | 'purple' | 'gray'>('red')
+const tagLabels = ref<Record<string, string>>({})
 
 const statusCounts = computed(() => {
   const counts: Record<Order['status'], number> = {
@@ -42,14 +46,36 @@ const load = async () => {
     .order('created_at', { ascending: false })
   orders.value = (data || []) as Order[]
 }
-onMounted(load)
+
+const loadTagLabels = async () => {
+  if (!supabase) return
+  const { data } = await supabase.from('settings').select('key,value')
+  if (!data) return
+  const map = Object.fromEntries(data.map((r: any) => [r.key, r.value]))
+  tagLabels.value = {
+    red: map.order_tag_red_label || 'Cliente não pagou a entrada',
+    orange: map.order_tag_orange_label || '',
+    yellow: map.order_tag_yellow_label || '',
+    green: map.order_tag_green_label || '',
+    teal: map.order_tag_teal_label || '',
+    blue: map.order_tag_blue_label || '',
+    purple: map.order_tag_purple_label || '',
+    gray: map.order_tag_gray_label || '',
+  }
+}
+
+onMounted(() => {
+  load()
+  loadTagLabels()
+})
 
 const filtered = () => orders.value.filter((o) => {
   const q = query.value.toLowerCase()
   const okQ = !q || o.customer_name.toLowerCase().includes(q)
   const okS = !status.value || o.status === status.value
   const okD = !date.value || o.created_at?.startsWith(date.value)
-  return okQ && okS && okD
+  const okTag = !tagFilter.value || o.admin_tag_color === tagFilter.value
+  return okQ && okS && okD && okTag
 })
 
 const openDetails = async (o: Order) => {
@@ -96,6 +122,50 @@ const applyBulkStatus = async () => {
   await supabase.from('orders').update({ status: bulkStatus.value }).in('id', selectedIds.value)
   selectedIds.value = []
   bulkStatus.value = ''
+  await load()
+}
+
+const startEditTag = (o: Order) => {
+  editingTagForId.value = String(o.id)
+  const current = o.admin_tag_color as typeof tagColor.value | undefined
+  const allowed: typeof tagColor.value[] = ['red', 'orange', 'yellow', 'green', 'teal', 'blue', 'purple', 'gray']
+  tagColor.value = current && allowed.includes(current) ? current : 'red'
+}
+
+const cancelEditTag = () => {
+  editingTagForId.value = null
+}
+
+const selectTagColor = (color: typeof tagColor.value) => {
+  tagColor.value = color
+}
+
+const saveTag = async (o: Order) => {
+  if (!supabase) return
+  const payload: Record<string, any> = {
+    admin_tag_color: tagColor.value,
+  }
+  await supabase.from('orders').update(payload).eq('id', o.id)
+  editingTagForId.value = null
+  await load()
+}
+
+const clearTag = async (o: Order) => {
+  if (!supabase) return
+  await supabase.from('orders').update({ admin_tag_color: null }).eq('id', o.id)
+  editingTagForId.value = null
+  await load()
+}
+
+const deleteOrder = async (o: Order) => {
+  if (!supabase) return
+  const confirmed = window.confirm('Tem certeza que deseja excluir este pedido? Essa ação não pode ser desfeita.')
+  if (!confirmed) return
+  await supabase.from('order_items').delete().eq('order_id', o.id)
+  await supabase.from('orders').delete().eq('id', o.id)
+  if (selectedOrder.value?.id === o.id) {
+    closeDetails()
+  }
   await load()
 }
 
@@ -228,6 +298,21 @@ const printSelectedOrder = () => {
             <option value="cancelled">Cancelado</option>
           </select>
         </div>
+
+        <div class="field-group">
+          <label for="orders-tag">Tag</label>
+          <select id="orders-tag" v-model="tagFilter" class="field-input">
+            <option value="">Todas</option>
+            <option value="red">Vermelha – {{ tagLabels.red || 'sem texto definido' }}</option>
+            <option value="orange">Laranja – {{ tagLabels.orange || 'sem texto definido' }}</option>
+            <option value="yellow">Amarela – {{ tagLabels.yellow || 'sem texto definido' }}</option>
+            <option value="green">Verde – {{ tagLabels.green || 'sem texto definido' }}</option>
+            <option value="teal">Verde água – {{ tagLabels.teal || 'sem texto definido' }}</option>
+            <option value="blue">Azul – {{ tagLabels.blue || 'sem texto definido' }}</option>
+            <option value="purple">Roxa – {{ tagLabels.purple || 'sem texto definido' }}</option>
+            <option value="gray">Cinza – {{ tagLabels.gray || 'sem texto definido' }}</option>
+          </select>
+        </div>
       </div>
 
       <div class="orders-summary">
@@ -291,6 +376,107 @@ const printSelectedOrder = () => {
               <span class="order-total">Total: R$ {{ o.total.toFixed(2) }}</span>
               <span class="order-date">{{ o.created_at?.slice(0, 10) }}</span>
             </div>
+            <div
+              v-if="o.admin_tag_color && tagLabels[o.admin_tag_color]"
+              class="order-tag"
+              :data-color="o.admin_tag_color"
+            >
+              {{ tagLabels[o.admin_tag_color] }}
+            </div>
+
+            <div v-if="editingTagForId === String(o.id)" class="tag-editor">
+              <div class="tag-colors">
+                <button
+                  type="button"
+                  class="tag-color"
+                  :data-color="'red'"
+                  :aria-pressed="tagColor === 'red'"
+                  :title="tagLabels.red || 'Sem texto configurado para a tag vermelha'"
+                  @click="selectTagColor('red')"
+                >
+                  Vermelho
+                </button>
+                <button
+                  type="button"
+                  class="tag-color"
+                  :data-color="'orange'"
+                  :aria-pressed="tagColor === 'orange'"
+                  :title="tagLabels.orange || 'Sem texto configurado para a tag laranja'"
+                  @click="selectTagColor('orange')"
+                >
+                  Laranja
+                </button>
+                <button
+                  type="button"
+                  class="tag-color"
+                  :data-color="'yellow'"
+                  :aria-pressed="tagColor === 'yellow'"
+                  :title="tagLabels.yellow || 'Sem texto configurado para a tag amarela'"
+                  @click="selectTagColor('yellow')"
+                >
+                  Amarelo
+                </button>
+                <button
+                  type="button"
+                  class="tag-color"
+                  :data-color="'green'"
+                  :aria-pressed="tagColor === 'green'"
+                  :title="tagLabels.green || 'Sem texto configurado para a tag verde'"
+                  @click="selectTagColor('green')"
+                >
+                  Verde
+                </button>
+                <button
+                  type="button"
+                  class="tag-color"
+                  :data-color="'teal'"
+                  :aria-pressed="tagColor === 'teal'"
+                  :title="tagLabels.teal || 'Sem texto configurado para a tag verde água'"
+                  @click="selectTagColor('teal')"
+                >
+                  Verde água
+                </button>
+                <button
+                  type="button"
+                  class="tag-color"
+                  :data-color="'blue'"
+                  :aria-pressed="tagColor === 'blue'"
+                  :title="tagLabels.blue || 'Sem texto configurado para a tag azul'"
+                  @click="selectTagColor('blue')"
+                >
+                  Azul
+                </button>
+                <button
+                  type="button"
+                  class="tag-color"
+                  :data-color="'purple'"
+                  :aria-pressed="tagColor === 'purple'"
+                  :title="tagLabels.purple || 'Sem texto configurado para a tag roxa'"
+                  @click="selectTagColor('purple')"
+                >
+                  Roxo
+                </button>
+                <button
+                  type="button"
+                  class="tag-color"
+                  :data-color="'gray'"
+                  :aria-pressed="tagColor === 'gray'"
+                  :title="tagLabels.gray || 'Sem texto configurado para a tag cinza'"
+                  @click="selectTagColor('gray')"
+                >
+                  Cinza
+                </button>
+              </div>
+              <div class="tag-editor-actions">
+                <button class="btn" type="button" @click="saveTag(o)">
+                  Aplicar cor
+                </button>
+                <button class="btn" type="button" @click="clearTag(o)">
+                  Remover tag
+                </button>
+                <button class="btn" type="button" @click="cancelEditTag">Cancelar</button>
+              </div>
+            </div>
           </div>
 
           <div class="order-side">
@@ -315,6 +501,8 @@ const printSelectedOrder = () => {
 
             <div class="order-actions">
               <button class="btn" @click="openDetails(o)">Ver detalhes</button>
+              <button class="btn" type="button" @click="startEditTag(o)">Editar tag</button>
+              <button class="btn" @click="deleteOrder(o)">Excluir</button>
               <select :value="o.status" @change="onChangeStatus($event, o)" class="field-input small-select">
                 <option value="pending">Novo</option>
                 <option value="confirmed">Confirmado</option>
@@ -552,6 +740,56 @@ const printSelectedOrder = () => {
   flex-wrap: wrap;
 }
 
+.order-tag {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.order-tag[data-color='red'] {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.order-tag[data-color='orange'] {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.order-tag[data-color='yellow'] {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.order-tag[data-color='green'] {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.order-tag[data-color='teal'] {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.order-tag[data-color='blue'] {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.order-tag[data-color='purple'] {
+  background: #f3e8ff;
+  color: #6b21a8;
+}
+
+.order-tag[data-color='gray'] {
+  background: #e5e7eb;
+  color: #111827;
+}
+
 .order-side {
   display: flex;
   flex-direction: column;
@@ -607,6 +845,82 @@ const printSelectedOrder = () => {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.tag-editor {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fdfaf4;
+  border: 1px solid #e5d4c8;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tag-input {
+  font-size: 13px;
+}
+
+.tag-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-color {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #f9fafb;
+}
+
+.tag-color[data-color='red'] {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.tag-color[data-color='orange'] {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.tag-color[data-color='yellow'] {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.tag-color[data-color='green'] {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.tag-color[data-color='blue'] {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.tag-color[data-color='teal'] {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.tag-color[data-color='purple'] {
+  background: #f3e8ff;
+  color: #6b21a8;
+}
+
+.tag-color[data-color='gray'] {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.tag-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .btn {
