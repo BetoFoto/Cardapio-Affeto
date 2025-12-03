@@ -6,8 +6,8 @@ import { supabase } from '../lib/supabase'
 import Breadcrumbs from '../components/Breadcrumbs.vue'
 
 const cart = useCartStore()
-const form = reactive({ name: '', phone: '', address: '', date: '', time: '' })
-const valid = computed(() => form.name && form.phone && form.address && form.date && form.time && cart.items.length)
+const form = reactive({ name: '', phone: '', address: '', date: '' })
+const valid = computed(() => form.name && form.phone && form.address && form.date && cart.items.length)
 
 const envWhatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined
 
@@ -42,7 +42,7 @@ const itemsText = computed(() =>
 
 const defaultMessage = computed(
   () =>
-    `Pedido Affetto\n\nCliente: ${form.name}\nWhatsApp: ${form.phone}\nEndereço: ${form.address}\nData: ${form.date}\nHorário: ${form.time}\n\nItens:\n${itemsText.value}\n\nTotal: R$ ${cart.total.toFixed(2)}`,
+    `Pedido Affetto\n\nCliente: ${form.name}\nWhatsApp: ${form.phone}\nEndereço: ${form.address}\nData: ${form.date}\nHorário: a combinar\n\nItens:\n${itemsText.value}\n\nTotal: R$ ${cart.total.toFixed(2)}`,
 )
 
 const message = computed(() => {
@@ -53,7 +53,7 @@ const message = computed(() => {
     .replace('{{whatsapp}}', form.phone)
     .replace('{{endereco}}', form.address)
     .replace('{{data}}', form.date)
-    .replace('{{hora}}', form.time)
+    .replace('{{hora}}', 'a combinar')
     .replace('{{itens}}', itemsText.value)
     .replace('{{total}}', `R$ ${cart.total.toFixed(2)}`)
 })
@@ -81,7 +81,7 @@ const send = async () => {
       customer_whatsapp: form.phone,
       customer_address: form.address,
       delivery_date: form.date,
-      delivery_time: form.time,
+      delivery_time: 'a combinar',
       subtotal: cart.total,
       total: cart.total,
       status: 'pending',
@@ -166,10 +166,6 @@ const send = async () => {
               <label>
                 <span>Data preferida</span>
                 <input type="date" v-model="form.date" required />
-              </label>
-              <label>
-                <span>Horário</span>
-                <input type="time" v-model="form.time" required />
               </label>
             </div>
             <button class="btn primary" :disabled="!valid" type="submit">
