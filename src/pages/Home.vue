@@ -93,7 +93,7 @@ onMounted(loadSettings)
     </main>
     <section class="contact-shell" id="contato">
       <div class="contact-card">
-        <h2 class="contact-title">Fale com a Affetto</h2>
+        <h2 class="contact-title">Fale com a Affeto</h2>
         <p class="contact-subtitle">Estamos prontos para ajudar você a montar uma ceia inesquecível.</p>
 
         <div class="contact-grid">
