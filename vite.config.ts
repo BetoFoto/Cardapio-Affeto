@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'Cardápio de Natal Affetto',
-        short_name: 'Affetto Natal',
+        name: 'Cardápio de Natal Affeto',
+        short_name: 'Affeto Natal',
         description: 'Cardápio Interativo de Natal com carrinho e WhatsApp',
         theme_color: '#b31919',
         background_color: '#ffffff',
