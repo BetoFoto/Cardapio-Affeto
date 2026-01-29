@@ -6,8 +6,8 @@ import { supabase } from '../lib/supabase'
 import Breadcrumbs from '../components/Breadcrumbs.vue'
 
 const cart = useCartStore()
-const form = reactive({ name: '', phone: '', address: '', date: '' })
-const valid = computed(() => form.name && form.phone && form.address && form.date && cart.items.length)
+const form = reactive({ name: '', phone: '', address: '', date: '', time: '' })
+const valid = computed(() => form.name && form.phone && form.address && form.date && form.time && cart.items.length)
 
 const envWhatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined
 
@@ -42,7 +42,7 @@ const itemsText = computed(() =>
 
 const defaultMessage = computed(
   () =>
-    `Pedido Affetto\n\nCliente: ${form.name}\nWhatsApp: ${form.phone}\nEndereço: ${form.address}\nData: ${form.date}\nHorário: a combinar\n\nItens:\n${itemsText.value}\n\nTotal: R$ ${cart.total.toFixed(2)}`,
+    `Pedido Affetto\n\nCliente: ${form.name}\nWhatsApp: ${form.phone}\nEndereço: ${form.address}\nData: ${form.date}\nHorário: ${form.time}\n\nItens:\n${itemsText.value}\n\nTotal: R$ ${cart.total.toFixed(2)}`,
 )
 
 const message = computed(() => {
@@ -53,7 +53,7 @@ const message = computed(() => {
     .replace('{{whatsapp}}', form.phone)
     .replace('{{endereco}}', form.address)
     .replace('{{data}}', form.date)
-    .replace('{{hora}}', 'a combinar')
+    .replace('{{hora}}', form.time)
     .replace('{{itens}}', itemsText.value)
     .replace('{{total}}', `R$ ${cart.total.toFixed(2)}`)
 })
@@ -81,7 +81,7 @@ const send = async () => {
       customer_whatsapp: form.phone,
       customer_address: form.address,
       delivery_date: form.date,
-      delivery_time: 'a combinar',
+      delivery_time: form.time,
       subtotal: cart.total,
       total: cart.total,
       status: 'pending',
@@ -167,6 +167,10 @@ const send = async () => {
                 <span>Data preferida</span>
                 <input type="date" v-model="form.date" required />
               </label>
+              <label>
+                <span>Horário preferido</span>
+                <input type="time" v-model="form.time" required />
+              </label>
             </div>
             <button class="btn primary" :disabled="!valid" type="submit">
               Confirmar e enviar via WhatsApp
@@ -185,7 +189,8 @@ const send = async () => {
 <style scoped>
 .checkout-root {
   min-height: calc(100vh - 60px);
-  background: #f4f2f0;
+  background: var(--bg-tertiary);
+  transition: background-color 0.3s ease;
 }
 
 .wrap {
@@ -197,6 +202,7 @@ const send = async () => {
 .title {
   margin: 8px 0 16px;
   font-size: 24px;
+  color: var(--text-primary);
 }
 
 .layout {
@@ -206,15 +212,17 @@ const send = async () => {
 }
 
 .summary {
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 18px;
   padding: 18px 18px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .summary-title {
   margin: 0 0 12px;
   font-size: 18px;
+  color: var(--text-primary);
 }
 
 .items {
@@ -258,25 +266,27 @@ const send = async () => {
 
 .name {
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .size {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .meta {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .price {
   font-weight: 700;
+  color: var(--text-primary);
 }
 
 .totals {
   margin-top: 16px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-color);
   padding-top: 10px;
   display: flex;
   flex-direction: column;
@@ -286,22 +296,26 @@ const send = async () => {
 .totals .row {
   display: flex;
   justify-content: space-between;
+  color: var(--text-secondary);
 }
 
 .totals .grand span:last-child {
-  color: #b91c1c;
+  color: var(--accent-primary);
+  font-weight: 700;
 }
 
 .form-card {
-  background: #fefce8;
+  background: var(--bg-card);
   border-radius: 18px;
   padding: 18px 18px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .form-title {
   margin: 0 0 12px;
   font-size: 18px;
+  color: var(--text-primary);
 }
 
 .form {
@@ -315,12 +329,21 @@ label {
   flex-direction: column;
   gap: 4px;
   font-size: 13px;
+  color: var(--text-secondary);
 }
 
 input {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 8px 10px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
 }
 
 .row-2 {
@@ -332,18 +355,24 @@ input {
 .btn {
   margin-top: 8px;
   border-radius: 999px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   padding: 10px 14px;
   font-size: 14px;
-  background: #ffffff;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .primary {
-  background: #ea2a33;
-  border-color: #ea2a33;
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
   color: #ffffff;
   font-weight: 700;
+}
+
+.primary:hover:not([disabled]) {
+  background: var(--accent-hover);
 }
 
 button[disabled] {
@@ -353,10 +382,12 @@ button[disabled] {
 
 .empty {
   margin-top: 24px;
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 18px;
   padding: 18px 18px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 @media (max-width: 768px) {

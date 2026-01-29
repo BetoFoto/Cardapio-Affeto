@@ -131,7 +131,8 @@ onMounted(loadSettings)
 <style scoped>
 .home-root {
   min-height: calc(100vh - 60px);
-  background: #f4f2f0;
+  background: var(--bg-tertiary);
+  transition: background-color 0.3s ease;
 }
 
 .wrap {
@@ -151,7 +152,7 @@ onMounted(loadSettings)
   border-radius: 24px;
   padding: 40px 26px;
   color: #fff;
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--shadow-lg);
   position: relative;
   display: flex;
   align-items: flex-end;
@@ -183,18 +184,6 @@ onMounted(loadSettings)
   font-size: 15px;
 }
 
-.heroCta {
-  display: inline-block;
-  margin-top: 16px;
-  background: #f7d87c;
-  color: #4a3b16;
-  border: 1px solid #e6c766;
-  padding: 10px 18px;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 14px;
-}
-
 .catalog-shell {
   max-width: 1120px;
   margin: 0 auto;
@@ -202,29 +191,31 @@ onMounted(loadSettings)
 }
 
 .catalog-card {
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 24px;
   padding: 20px 18px 20px;
-  border: 1px solid #e3d8d3;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .catalog-header h2 {
   margin: 0;
   font-size: 22px;
+  color: var(--text-primary);
 }
 
 .catalog-header p {
   margin: 4px 0 16px;
   font-size: 14px;
-  color: #6b5a5a;
+  color: var(--text-muted);
 }
 
 .footer {
   margin-top: 24px;
-  border-top: 1px solid #f5d5c0;
+  border-top: 1px solid var(--border-light);
   padding-top: 18px;
-  color: #4b4b4b;
+  color: var(--text-secondary);
 }
 
 .footer-inner {
@@ -243,42 +234,19 @@ onMounted(loadSettings)
   margin: 0 0 4px;
   font-size: 18px;
   font-weight: 600;
-  color: #8c1c1c;
+  color: var(--accent-primary);
 }
 
 .footer-tagline {
   margin: 0;
   font-size: 13px;
-  color: #7b5a4a;
+  color: var(--text-muted);
 }
 
 .footer-right {
   display: flex;
   justify-content: flex-end;
   font-size: 13px;
-}
-
-.footer-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.footer-icon {
-  font-size: 14px;
-}
-
-.footer-text {
-  color: #4b4b4b;
-}
-
-.footer-link {
-  color: #b31919;
-  text-decoration: none;
-}
-
-.footer-link:hover {
-  text-decoration: underline;
 }
 
 .footer-links {
@@ -291,11 +259,13 @@ onMounted(loadSettings)
 .footer-links a {
   font-size: 13px;
   font-weight: 600;
-  color: #7b5a4a;
+  color: var(--text-muted);
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .footer-links a:hover {
+  color: var(--accent-primary);
   text-decoration: underline;
 }
 
@@ -306,7 +276,7 @@ onMounted(loadSettings)
 
 .copy {
   font-size: 12px;
-  color: #9b7b6b;
+  color: var(--text-muted);
 }
 
 .contact-shell {
@@ -317,23 +287,24 @@ onMounted(loadSettings)
 
 .contact-card {
   margin-top: 16px;
-  background: linear-gradient(135deg, #faf5f0, #fdf2f2);
+  background: var(--bg-card);
   border-radius: 20px;
   padding: 18px 18px 20px;
-  border: 1px solid #f0d6c8;
+  border: 1px solid var(--border-light);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .contact-title {
   margin: 0 0 4px;
   font-size: 18px;
   font-weight: 600;
-  color: #8c1c1c;
+  color: var(--accent-primary);
 }
 
 .contact-subtitle {
   margin: 0 0 12px;
   font-size: 13px;
-  color: #735b4b;
+  color: var(--text-muted);
 }
 
 .contact-grid {
@@ -349,16 +320,16 @@ onMounted(loadSettings)
 .contact-heading {
   margin: 0 0 4px;
   font-weight: 600;
-  color: #5b3b2b;
+  color: var(--text-primary);
 }
 
 .contact-text {
   margin: 0;
-  color: #4b4b4b;
+  color: var(--text-secondary);
 }
 
 .contact-link {
-  color: #b31919;
+  color: var(--accent-primary);
   text-decoration: none;
 }
 

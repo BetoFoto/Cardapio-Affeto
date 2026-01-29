@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useCartStore } from '../store/cart'
 import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '../lib/supabase'
+import ThemeToggle from './ThemeToggle.vue'
 
 const cart = useCartStore()
 const route = useRoute()
@@ -49,6 +50,7 @@ const goHome = () => router.push('/')
       </div>
 
       <nav v-if="!isAdmin" class="nav">
+        <ThemeToggle />
         <button class="cta" @click="goCart">Ver meu Pedido <span class="cartIcon">🛒</span><span class="badge" v-if="cart.count">{{ cart.count }}</span></button>
         <span class="offline" v-if="!online">Offline</span>
       </nav>
@@ -57,17 +59,107 @@ const goHome = () => router.push('/')
 </template>
 
 <style scoped>
-.header { position: sticky; top: 0; background: #f3f4f6; border-bottom: 1px solid #e5e7eb; z-index: 50 }
-.topbar { background: #2f2933; color: #fef4e6; font-size: 12px; }
-.topbar-inner { max-width: 1080px; margin: 0 auto; padding: 4px 16px; text-align: center; }
-.topbar-text { display: inline-block; }
-.wrap { display: flex; align-items: center; justify-content: space-between; max-width: 1080px; margin: 0 auto; padding: 12px 16px }
-.brand { font-weight: 700; font-size: 16px; cursor: pointer; color: #111827; display: flex; align-items: center; gap: 8px }
-.logo-wrapper { display: inline-flex; align-items: center; justify-content: center; height: 70px }
-.logo-wrapper img { max-height: 70px; max-width: 260px; object-fit: contain }
+.header {
+  position: sticky;
+  top: 0;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 50;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
 
-.cta { background: #f7d87c; color: #4a3b16; border: 1px solid #e6c766; padding: 8px 12px; border-radius: 10px }
-.cartIcon { margin-left: 8px }
-.badge { background: #b31919; color: #fff; border-radius: 999px; padding: 2px 8px; margin-left: 6px; font-size: 12px }
-.offline { margin-left: 12px; color: #b31919 }
+.topbar {
+  background: #2f2933;
+  color: #fef4e6;
+  font-size: 12px;
+}
+
+.topbar-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 4px 16px;
+  text-align: center;
+}
+
+.topbar-text {
+  display: inline-block;
+}
+
+.wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 12px 16px;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s ease;
+}
+
+.logo-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+}
+
+.logo-wrapper img {
+  max-height: 70px;
+  max-width: 260px;
+  object-fit: contain;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cta {
+  background: #f7d87c;
+  color: #4a3b16;
+  border: 1px solid #e6c766;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cta:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.cartIcon {
+  margin-left: 8px;
+}
+
+.badge {
+  background: var(--accent-primary);
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-left: 6px;
+  font-size: 12px;
+}
+
+.offline {
+  margin-left: 12px;
+  color: var(--accent-primary);
+  font-weight: 500;
+}
 </style>

@@ -18,8 +18,16 @@ const go = (p: string) => router.push(p)
 </template>
 
 <style scoped>
-.breadcrumbs { display: flex; align-items: center; gap: 8px; color: #666; font-size: 14px; margin: 8px 0 }
-.crumb { cursor: pointer }
-.sep { color: #aaa }
-.current { font-weight: 600; color: #000 }
+.breadcrumbs { 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  color: var(--text-muted); 
+  font-size: 14px; 
+  margin: 8px 0;
+}
+.crumb { cursor: pointer; transition: color 0.2s ease; }
+.crumb:hover { color: var(--accent-primary); }
+.sep { color: var(--text-muted); opacity: 0.6; }
+.current { font-weight: 600; color: var(--text-primary); }
 </style>

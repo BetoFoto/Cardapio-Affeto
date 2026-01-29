@@ -5,44 +5,63 @@ import { supabase } from '../lib/supabase'
 import type { Product } from '../types'
 import Breadcrumbs from '../components/Breadcrumbs.vue'
 import ProductCard from '../components/ProductCard.vue'
+import ErrorState from '../components/ErrorState.vue'
+import { useSupabaseWithRetry } from '../composables/useSupabaseWithRetry'
 
 const route = useRoute()
-const products = ref<Product[]>([])
-const loading = ref(true)
-const errorMsg = ref('')
 const slug = route.params.slug as string
 const categoryName = ref('')
+const categoryId = ref<string | null>(null)
 
-onMounted(async () => {
+const { state: categoryState, execute: executeCategory } = useSupabaseWithRetry<any>()
+const { state: productsState, execute: executeProducts } = useSupabaseWithRetry<Product[]>()
+
+const loading = ref(true)
+
+const loadData = async () => {
+  loading.value = true
+
   if (!supabase) {
-    errorMsg.value = 'Conexão com banco não configurada'
     loading.value = false
     return
   }
+
   // 1) Buscar categoria pelo slug
-  const { data: cat, error: catErr } = await supabase
-    .from('categories')
-    .select('id,name')
-    .eq('slug', slug)
-    .limit(1)
-    .maybeSingle()
-  if (catErr || !cat) {
-    errorMsg.value = 'Categoria não encontrada'
+  const cat = await executeCategory(async () => {
+    return await supabase!
+      .from('categories')
+      .select('id,name')
+      .eq('slug', slug)
+      .limit(1)
+      .maybeSingle()
+  })
+
+  if (!cat) {
     loading.value = false
     return
   }
+
+  categoryId.value = cat.id
   categoryName.value = cat.name
+
   // 2) Buscar produtos por category_id
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('active', true)
-    .eq('category_id', cat.id)
-    .order('name', { ascending: true })
-  if (error) errorMsg.value = 'Erro ao buscar produtos'
-  products.value = (data || []) as Product[]
+  await executeProducts(async () => {
+    return await supabase!
+      .from('products')
+      .select('*')
+      .eq('active', true)
+      .eq('category_id', cat.id)
+      .order('name', { ascending: true })
+  })
+
   loading.value = false
-})
+}
+
+onMounted(loadData)
+
+const handleRetry = () => {
+  loadData()
+}
 </script>
 
 <template>
@@ -53,14 +72,36 @@ onMounted(async () => {
           <Breadcrumbs />
           <h2 class="title">{{ categoryName || slug.replace('-', ' ') }}</h2>
         </header>
-        <div v-if="loading" class="state">Carregando...</div>
-        <div v-else-if="!errorMsg">
-          <div v-if="products.length" class="grid">
-            <ProductCard v-for="p in products" :key="p.id" :product="p" />
-          </div>
-          <div v-else class="state">Nenhum produto disponível.</div>
+
+        <!-- Loading State -->
+        <div v-if="loading || productsState.loading" class="state" role="status" aria-live="polite">
+          <span class="spinner" aria-hidden="true"></span>
+          Carregando...
         </div>
-        <div v-else class="state">{{ errorMsg }}</div>
+
+        <!-- Error State -->
+        <ErrorState
+          v-else-if="categoryState.error"
+          :message="categoryState.error"
+          :retrying="categoryState.retrying"
+          show-retry
+          @retry="handleRetry"
+        />
+        <ErrorState
+          v-else-if="productsState.error"
+          :message="productsState.error"
+          :retrying="productsState.retrying"
+          show-retry
+          @retry="handleRetry"
+        />
+
+        <!-- Success State -->
+        <div v-else>
+          <div v-if="productsState.data?.length" class="grid">
+            <ProductCard v-for="p in productsState.data" :key="p.id" :product="p" />
+          </div>
+          <div v-else class="state" role="status">Nenhum produto disponível nesta categoria.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -69,7 +110,8 @@ onMounted(async () => {
 <style scoped>
 .category-root {
   min-height: calc(100vh - 60px);
-  background: #f4f2f0;
+  background: var(--bg-tertiary);
+  transition: background-color 0.3s ease;
 }
 
 .wrap {
@@ -79,11 +121,12 @@ onMounted(async () => {
 }
 
 .category-card {
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 24px;
   padding: 18px 18px 20px;
-  border: 1px solid #e3d8d3;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .category-header {
@@ -94,6 +137,7 @@ onMounted(async () => {
   margin: 4px 0 0;
   font-size: 22px;
   text-transform: capitalize;
+  color: var(--text-primary);
 }
 
 .grid {
@@ -103,8 +147,29 @@ onMounted(async () => {
 }
 
 .state {
-  color: #666;
+  color: var(--text-muted);
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 2rem;
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 640px) {

@@ -95,7 +95,8 @@ const incQty = (idx: number) => {
 <style scoped>
 .cart-root {
   min-height: calc(100vh - 60px);
-  background: #fef2f2;
+  background: var(--bg-tertiary);
+  transition: background-color 0.3s ease;
 }
 
 .wrap {
@@ -107,16 +108,18 @@ const incQty = (idx: number) => {
 .title {
   margin: 8px 0 16px;
   font-size: 24px;
+  color: var(--text-primary);
 }
 
 .empty {
   margin-top: 24px;
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 18px;
   padding: 24px 20px;
-  border: 1px solid #f1e9e5;
+  border: 1px solid var(--border-light);
   text-align: center;
-  color: #4b5563;
+  color: var(--text-secondary);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .layout {
@@ -132,13 +135,14 @@ const incQty = (idx: number) => {
 }
 
 .item-card {
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 16px;
   padding: 10px 14px;
-  border: 1px solid #f1e9e5;
+  border: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .item-main {
@@ -170,21 +174,23 @@ const incQty = (idx: number) => {
 .name {
   font-weight: 700;
   font-size: 15px;
+  color: var(--text-primary);
 }
 
 .size {
   font-weight: 500;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .meta {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .price {
   font-weight: 700;
+  color: var(--text-primary);
 }
 
 .item-footer {
@@ -203,43 +209,63 @@ const incQty = (idx: number) => {
   width: 56px;
   padding: 4px 6px;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.qty-btn {
+  padding: 4px 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .icon-btn {
   border: none;
   background: transparent;
   cursor: pointer;
+  font-size: 18px;
 }
 
 .summary {
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 18px;
   padding: 16px 18px;
-  border: 1px solid #f1e9e5;
+  border: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
   gap: 10px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.summary h3 {
+  color: var(--text-primary);
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
+  color: var(--text-secondary);
 }
 
 .summary-row.total span:last-child {
-  color: #ea2a33;
+  color: var(--accent-primary);
   font-weight: 700;
 }
 
 .btn {
   border-radius: 999px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   padding: 8px 14px;
   font-size: 13px;
-  background: #ffffff;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .btn.full {
@@ -247,18 +273,22 @@ const incQty = (idx: number) => {
 }
 
 .btn.primary {
-  background: #ea2a33;
-  border-color: #ea2a33;
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
   color: #ffffff;
   font-weight: 700;
 }
 
+.btn.primary:hover {
+  background: var(--accent-hover);
+}
+
 .btn.ghost {
-  background: #f9fafb;
+  background: var(--bg-tertiary);
 }
 
 .btn.outline {
-  border-color: #d1d5db;
+  border-color: var(--border-color);
 }
 
 @media (max-width: 768px) {

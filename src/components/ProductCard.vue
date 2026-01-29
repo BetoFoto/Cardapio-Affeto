@@ -59,13 +59,14 @@ const inCart = computed(() => {
 
 <style scoped>
 .card {
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 18px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-  border: 1px solid #f1e9e5;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .img-wrap {
@@ -93,16 +94,17 @@ const inCart = computed(() => {
 .name {
   font-weight: 700;
   font-size: 16px;
+  color: var(--text-primary);
 }
 
 .desc {
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 13px;
   min-height: 2.6em;
 }
 
 .price {
-  color: #111827;
+  color: var(--text-primary);
   font-weight: 700;
   margin-top: 2px;
 }
@@ -116,34 +118,42 @@ const inCart = computed(() => {
 
 .btn {
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   padding: 8px 12px;
   font-size: 13px;
-  background: #ffffff;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   cursor: pointer;
   transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
 }
 
 .size-btn {
-  background: #f9fafb;
+  background: var(--bg-tertiary);
+}
+
+.size-btn:hover {
+  background: var(--hover-bg);
 }
 
 .primary {
   margin-top: 10px;
   width: 100%;
   justify-content: center;
-  background: #ea2a33;
-  border-color: #ea2a33;
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
   color: #ffffff;
   font-weight: 700;
   font-size: 13px;
 }
 
-.btn:hover {
-  background: #f3f4f6;
+.secondary {
+  margin-top: 10px;
+  width: 100%;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
 }
 
 .primary:hover {
-  background: #d1151e;
+  background: var(--accent-hover);
 }
 </style>
