@@ -23,13 +23,24 @@ const incQty = (idx: number) => {
   if (!item) return
   cart.updateQuantity(idx, item.quantity + 1)
 }
+
+// Verifica se item permite alterar quantidade (faixas não permitem)
+const canChangeQty = (idx: number) => {
+  const item = cart.items[idx]
+  return item && !item.priceTierId
+}
+
+// Retorna o preço unitário para exibição
+const getDisplayPrice = (item: typeof cart.items[0]) => {
+  return item.tierPrice || item.unitPrice || 0
+}
 </script>
 
 <template>
   <div class="cart-root">
     <div class="wrap">
       <Breadcrumbs />
-      <h2 class="title">Revise seu Pedido de Natal</h2>
+      <h2 class="title">Seu Pedido</h2>
 
       <div v-if="!cart.items.length" class="empty">
         <p>Seu carrinho está vazio.</p>
@@ -50,14 +61,21 @@ const incQty = (idx: number) => {
               <div class="info">
                 <div class="name">
                   {{ item.name }}
-                  <span v-if="item.sizeLabel" class="size">• {{ item.sizeLabel }}</span>
+                  <span v-if="item.tierLabel" class="tier-label">• {{ item.tierLabel }}</span>
+                  <span v-else-if="item.sizeLabel" class="size">• {{ item.sizeLabel }}</span>
                 </div>
-                <div class="meta">R$ {{ item.unitPrice.toFixed(2) }} / unidade</div>
+                <div class="meta" v-if="!item.tierLabel">
+                  R$ {{ getDisplayPrice(item).toFixed(2) }} / unidade
+                </div>
+                <div class="meta tier-meta" v-else>
+                  Pacote para evento
+                </div>
               </div>
               <div class="price">R$ {{ item.subtotal.toFixed(2) }}</div>
             </div>
             <div class="item-footer">
-              <div class="qty">
+              <!-- Controles de quantidade apenas para itens sem faixa -->
+              <div class="qty" v-if="canChangeQty(idx)">
                 <input
                   type="number"
                   min="1"
@@ -66,6 +84,9 @@ const incQty = (idx: number) => {
                 />
                 <button type="button" class="qty-btn" @click="decQty(idx)">−</button>
                 <button type="button" class="qty-btn" @click="incQty(idx)">+</button>
+              </div>
+              <div v-else class="qty-fixed">
+                <span class="qty-badge">1x</span>
               </div>
               <button type="button" class="icon-btn" @click="cart.remove(idx)">🗑</button>
             </div>
@@ -183,6 +204,16 @@ const incQty = (idx: number) => {
   color: var(--text-muted);
 }
 
+.tier-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--accent-primary);
+}
+
+.tier-meta {
+  font-style: italic;
+}
+
 .meta {
   font-size: 13px;
   color: var(--text-muted);
@@ -221,6 +252,19 @@ const incQty = (idx: number) => {
   color: var(--text-primary);
   border-radius: 6px;
   cursor: pointer;
+}
+
+.qty-fixed {
+  display: flex;
+  align-items: center;
+}
+
+.qty-badge {
+  padding: 4px 12px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
 .icon-btn {

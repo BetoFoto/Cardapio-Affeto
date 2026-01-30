@@ -221,7 +221,7 @@ const save = async () => {
               v-model="settings.topbar_message"
               class="field-textarea"
               rows="2"
-              placeholder="Ex: Vagas limitadas para ceias de Natal. Garanta seu pedido até 15/12."
+              placeholder="Ex: Vagas limitadas! Garanta seu pedido com antecedência."
             />
           </div>
         </div>
@@ -240,7 +240,7 @@ const save = async () => {
               id="home_banner_title"
               v-model="settings.home_banner_title"
               class="field-input"
-              placeholder="Ex: Bem-vindo ao Cardápio Natalino Affetto"
+              placeholder="Ex: Bem-vindo ao nosso Buffet"
             />
           </div>
 
@@ -313,7 +313,7 @@ const save = async () => {
               v-model="settings.how_to_order_text"
               class="field-textarea"
               rows="4"
-              placeholder="Explique passo a passo como o cliente faz o pedido da ceia."
+              placeholder="Explique passo a passo como o cliente faz o pedido."
             />
           </div>
 

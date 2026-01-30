@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '../lib/supabase'
-import type { Product } from '../types'
+import type { BuffetProduct } from '../types'
 import Breadcrumbs from '../components/Breadcrumbs.vue'
 import ProductCard from '../components/ProductCard.vue'
 import ErrorState from '../components/ErrorState.vue'
@@ -14,7 +14,7 @@ const categoryName = ref('')
 const categoryId = ref<string | null>(null)
 
 const { state: categoryState, execute: executeCategory } = useSupabaseWithRetry<any>()
-const { state: productsState, execute: executeProducts } = useSupabaseWithRetry<Product[]>()
+const { state: productsState, execute: executeProducts } = useSupabaseWithRetry<BuffetProduct[]>()
 
 const loading = ref(true)
 
@@ -44,11 +44,11 @@ const loadData = async () => {
   categoryId.value = cat.id
   categoryName.value = cat.name
 
-  // 2) Buscar produtos por category_id
+  // 2) Buscar produtos com price_tiers
   await executeProducts(async () => {
     return await supabase!
       .from('products')
-      .select('*')
+      .select('*, price_tiers(*)')
       .eq('active', true)
       .eq('category_id', cat.id)
       .order('name', { ascending: true })

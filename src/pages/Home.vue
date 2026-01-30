@@ -50,11 +50,11 @@ onMounted(loadSettings)
       <div class="wrap">
         <div class="heroBox" :style="heroStyle">
           <div class="hero-text">
-            <h1>{{ bannerTitle || 'Nossa Ceia de Natal Especial' }}</h1>
+            <h1>{{ bannerTitle || 'Bem-vindo ao nosso Buffet' }}</h1>
             <p>
               {{
                 bannerText ||
-                  'Sabores inesquecíveis para a sua celebração. Explore nosso cardápio e monte a ceia perfeita para compartilhar com quem você ama.'
+                  'Sabores inesquecíveis para a sua celebração. Explore nosso cardápio e monte o evento perfeito para compartilhar com quem você ama.'
               }}
             </p>
           </div>
@@ -65,7 +65,7 @@ onMounted(loadSettings)
       <div class="catalog-card">
         <header class="catalog-header">
           <h2>Explore nosso cardápio</h2>
-          <p>Escolha as categorias para montar uma ceia completa, do prato principal à sobremesa.</p>
+          <p>Escolha as categorias para montar seu evento, do prato principal à sobremesa.</p>
         </header>
         <CategoryGrid />
         <footer class="footer">
@@ -73,7 +73,7 @@ onMounted(loadSettings)
             <div class="footer-left">
               <h3 class="footer-brand">{{ brandName }}</h3>
               <p class="footer-tagline">
-                Ceias natalinas artesanais preparadas com carinho para a sua família.
+                Buffet artesanal preparado com carinho para o seu evento.
               </p>
             </div>
 
@@ -93,8 +93,8 @@ onMounted(loadSettings)
     </main>
     <section class="contact-shell" id="contato">
       <div class="contact-card">
-        <h2 class="contact-title">Fale com a Affeto</h2>
-        <p class="contact-subtitle">Estamos prontos para ajudar você a montar uma ceia inesquecível.</p>
+        <h2 class="contact-title">Fale Conosco</h2>
+        <p class="contact-subtitle">Estamos prontos para ajudar você a montar um evento inesquecível.</p>
 
         <div class="contact-grid">
           <div class="contact-block">

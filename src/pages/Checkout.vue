@@ -117,7 +117,7 @@ const send = async () => {
 
       <div class="layout" v-if="cart.items.length">
         <section class="summary">
-          <h3 class="summary-title">Seu pedido de Natal</h3>
+          <h3 class="summary-title">Seu Pedido</h3>
           <div class="items">
             <div v-for="(item, idx) in cart.items" :key="idx" class="item-row">
               <div class="item-main">

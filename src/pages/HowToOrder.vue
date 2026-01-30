@@ -20,13 +20,13 @@ onMounted(loadSettings)
     <div class="page-card">
       <header class="page-header">
         <h1>Como encomendar</h1>
-        <p>Entenda como fazer seu pedido de ceia com a Affetto.</p>
+        <p>Entenda como fazer seu pedido conosco.</p>
       </header>
       <section class="page-content">
         <p v-if="howToOrderText" class="text-block">{{ howToOrderText }}</p>
         <p v-else class="text-block">
           Em breve teremos instruções detalhadas de como realizar seu pedido.
-          Enquanto isso, você pode montar sua ceia pelo catálogo e finalizar pelo WhatsApp.
+          Enquanto isso, você pode montar seu pedido pelo catálogo e finalizar pelo WhatsApp.
         </p>
       </section>
     </div>
