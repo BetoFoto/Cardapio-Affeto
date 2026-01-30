@@ -1,6 +1,6 @@
-# Cardápio de Natal Affetto
+# Affeto Gastronomia Artesanal
 
-Aplicação web PWA em Vue 3 + TypeScript + Vite, com Pinia (estado), Vue Router (rotas) e Supabase (dados e Auth). Permite navegar pelo cardápio, montar carrinho e finalizar pedido via WhatsApp. Possui área administrativa com autenticação.
+Aplicação web PWA em Vue 3 + TypeScript + Vite, com Pinia (estado), Vue Router (rotas) e Supabase (dados e Auth). Permite navegar pelo cardápio de buffet, montar carrinho e finalizar pedido via WhatsApp. Possui área administrativa com autenticação.
 
 ## Requisitos
 

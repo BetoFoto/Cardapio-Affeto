@@ -2,6 +2,7 @@
 import { onMounted, ref, computed } from 'vue'
 import { supabase } from '../../lib/supabase'
 import type { BuffetProduct, PriceTier } from '../../types'
+import CurrencyInput from '../../components/CurrencyInput.vue'
 
 const products = ref<BuffetProduct[]>([])
 const editing = ref<BuffetProduct | null>(null)
@@ -345,7 +346,7 @@ const cancelBulkDelete = () => {
             </label>
             <label v-if="editing.pricing_mode === 'unit' || editing.pricing_mode === 'both'">
               <span>Preço base (unitário)</span>
-              <input type="number" step="0.01" v-model.number="editing.base_price" />
+              <CurrencyInput v-model="editing.base_price" placeholder="0,00" />
             </label>
             <div v-if="editing.pricing_mode === 'tiers' || editing.pricing_mode === 'both'" class="tiers-section">
               <div class="tiers-header">
@@ -355,7 +356,7 @@ const cancelBulkDelete = () => {
               <div v-for="(tier, idx) in editingTiers" :key="tier.id" class="tier-row">
                 <input v-model="tier.label" placeholder="Ex: Até 50 Convidados" class="tier-label" />
                 <input type="number" v-model.number="tier.max_guests" placeholder="Máx" class="tier-guests" />
-                <input type="number" step="0.01" v-model.number="tier.price" placeholder="Preço" class="tier-price" />
+                <CurrencyInput v-model="tier.price" placeholder="0,00" class="tier-price" />
                 <button type="button" class="btn ghost tier-remove" @click="removeTier(idx)">✕</button>
               </div>
               <p v-if="editingTiers.length === 0" class="tiers-empty">Nenhuma faixa cadastrada.</p>
@@ -366,11 +367,11 @@ const cancelBulkDelete = () => {
             <div v-if="editing.has_size_options" class="sizes">
               <label>
                 <span>Preço 5p</span>
-                <input type="number" step="0.01" v-model.number="editing.size_5p_price" />
+                <CurrencyInput v-model="editing.size_5p_price" placeholder="0,00" />
               </label>
               <label>
                 <span>Preço 10p</span>
-                <input type="number" step="0.01" v-model.number="editing.size_10p_price" />
+                <CurrencyInput v-model="editing.size_10p_price" placeholder="0,00" />
               </label>
             </div>
             <label>
