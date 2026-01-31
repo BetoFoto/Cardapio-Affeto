@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { useCartStore } from '../store/cart'
 import { useRouter } from 'vue-router'
+import { useCurrency } from '../composables/useCurrency'
 import Breadcrumbs from '../components/Breadcrumbs.vue'
+
 const cart = useCartStore()
 const router = useRouter()
+const { formatToBRLWithSymbol } = useCurrency()
 const goMenu = () => router.push('/')
 const goCheckout = () => router.push('/checkout')
 
@@ -65,13 +68,13 @@ const getDisplayPrice = (item: typeof cart.items[0]) => {
                   <span v-else-if="item.sizeLabel" class="size">• {{ item.sizeLabel }}</span>
                 </div>
                 <div class="meta" v-if="!item.tierLabel">
-                  R$ {{ getDisplayPrice(item).toFixed(2) }} / unidade
+                  {{ formatToBRLWithSymbol(getDisplayPrice(item)) }} / unidade
                 </div>
                 <div class="meta tier-meta" v-else>
                   Pacote para evento
                 </div>
               </div>
-              <div class="price">R$ {{ item.subtotal.toFixed(2) }}</div>
+              <div class="price">{{ formatToBRLWithSymbol(item.subtotal) }}</div>
             </div>
             <div class="item-footer">
               <!-- Controles de quantidade apenas para itens sem faixa -->
@@ -97,11 +100,11 @@ const getDisplayPrice = (item: typeof cart.items[0]) => {
           <h3>Resumo do Pedido</h3>
           <div class="summary-row">
             <span>Subtotal</span>
-            <span>R$ {{ cart.total.toFixed(2) }}</span>
+            <span>{{ formatToBRLWithSymbol(cart.total) }}</span>
           </div>
           <div class="summary-row total">
             <span>Total do Pedido</span>
-            <span>R$ {{ cart.total.toFixed(2) }}</span>
+            <span>{{ formatToBRLWithSymbol(cart.total) }}</span>
           </div>
           <button class="btn primary full" @click="goCheckout">
             Finalizar e Enviar via WhatsApp

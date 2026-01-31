@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { reactive, computed, ref, onMounted } from 'vue'
 import { useCartStore } from '../store/cart'
+import { useCurrency } from '../composables/useCurrency'
 import type { Order } from '../types'
 import { supabase } from '../lib/supabase'
 import Breadcrumbs from '../components/Breadcrumbs.vue'
 
 const cart = useCartStore()
+const { formatToBRLWithSymbol } = useCurrency()
 const form = reactive({ name: '', phone: '', address: '', date: '', time: '' })
 const valid = computed(() => form.name && form.phone && form.address && form.date && form.time && cart.items.length)
 
@@ -35,14 +37,14 @@ const itemsText = computed(() =>
   cart.items
     .map(
       (i) =>
-        `• ${i.name}${i.sizeLabel ? ' (' + i.sizeLabel + ')' : ''} x${i.quantity} — R$ ${i.subtotal.toFixed(2)}`,
+        `• ${i.name}${i.sizeLabel ? ' (' + i.sizeLabel + ')' : ''} x${i.quantity} — ${formatToBRLWithSymbol(i.subtotal)}`,
     )
     .join('\n'),
 )
 
 const defaultMessage = computed(
   () =>
-    `Pedido Affetto\n\nCliente: ${form.name}\nWhatsApp: ${form.phone}\nEndereço: ${form.address}\nData: ${form.date}\nHorário: ${form.time}\n\nItens:\n${itemsText.value}\n\nTotal: R$ ${cart.total.toFixed(2)}`,
+    `Pedido Affetto\n\nCliente: ${form.name}\nWhatsApp: ${form.phone}\nEndereço: ${form.address}\nData: ${form.date}\nHorário: ${form.time}\n\nItens:\n${itemsText.value}\n\nTotal: ${formatToBRLWithSymbol(cart.total)}`,
 )
 
 const message = computed(() => {
@@ -55,7 +57,7 @@ const message = computed(() => {
     .replace('{{data}}', form.date)
     .replace('{{hora}}', form.time)
     .replace('{{itens}}', itemsText.value)
-    .replace('{{total}}', `R$ ${cart.total.toFixed(2)}`)
+    .replace('{{total}}', formatToBRLWithSymbol(cart.total))
 })
 
 const send = async () => {
@@ -132,17 +134,17 @@ const send = async () => {
                   <div class="meta">Quantidade: {{ item.quantity }}</div>
                 </div>
               </div>
-              <div class="price">R$ {{ item.subtotal.toFixed(2) }}</div>
+              <div class="price">{{ formatToBRLWithSymbol(item.subtotal) }}</div>
             </div>
           </div>
           <div class="totals">
             <div class="row">
               <span>Subtotal</span>
-              <span>R$ {{ cart.total.toFixed(2) }}</span>
+              <span>{{ formatToBRLWithSymbol(cart.total) }}</span>
             </div>
             <div class="row grand">
               <span>Total do pedido</span>
-              <span>R$ {{ cart.total.toFixed(2) }}</span>
+              <span>{{ formatToBRLWithSymbol(cart.total) }}</span>
             </div>
           </div>
         </section>

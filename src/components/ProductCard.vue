@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { BuffetProduct, SizeOption, PriceTier } from '../types'
 import { useCartStore } from '../store/cart'
+import { useCurrency } from '../composables/useCurrency'
 import { computed } from 'vue'
 
 const props = defineProps<{ product: BuffetProduct }>()
+const { formatToBRLWithSymbol } = useCurrency()
 const cart = useCartStore()
 
 // Métodos para adicionar ao carrinho
@@ -78,7 +80,7 @@ const formattedLongDescription = computed(() => {
       
       <!-- Preço unitário (quando não tem faixas nem tamanhos) -->
       <div class="price" v-if="!priceTiers && !legacySizes && product.base_price != null">
-        R$ {{ Number(product.base_price).toFixed(2) }}
+        {{ formatToBRLWithSymbol(Number(product.base_price)) }}
       </div>
       
       <!-- Faixas de preço (novo modelo) -->
@@ -91,7 +93,7 @@ const formattedLongDescription = computed(() => {
           @click="!tierInCart(tier.id) && selectTier(tier)"
         >
           <span class="tier-label">{{ tier.label }}</span>
-          <span class="tier-price">R$ {{ Number(tier.price).toFixed(2) }}</span>
+          <span class="tier-price">{{ formatToBRLWithSymbol(Number(tier.price)) }}</span>
           <span v-if="tierInCart(tier.id)" class="tier-check">✓</span>
         </button>
       </div>
@@ -105,7 +107,7 @@ const formattedLongDescription = computed(() => {
           type="button"
           @click="selectSize(s)"
         >
-          {{ s.label }} • R$ {{ s.price.toFixed(2) }}
+          {{ s.label }} • {{ formatToBRLWithSymbol(s.price) }}
         </button>
       </div>
       
@@ -127,7 +129,7 @@ const formattedLongDescription = computed(() => {
         type="button"
         @click="!inCart && addUnit()"
       >
-        <span v-if="!inCart">Avulso • R$ {{ Number(product.base_price).toFixed(2) }}</span>
+        <span v-if="!inCart">Avulso • {{ formatToBRLWithSymbol(Number(product.base_price)) }}</span>
         <span v-else>Avulso adicionado ✓</span>
       </button>
     </div>
