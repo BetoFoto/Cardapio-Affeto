@@ -3,7 +3,7 @@ import { ref, watch, onMounted } from 'vue'
 import { useCurrency } from '../composables/useCurrency'
 
 const props = defineProps<{
-  modelValue: number
+  modelValue: number | undefined
   placeholder?: string
 }>()
 
